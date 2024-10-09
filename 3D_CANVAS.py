@@ -5,6 +5,27 @@
 
 import tkinter as tk
 import time
+import Utilities
+
+from Utilities import my_range
+
+
+"""
+Define a function called plot(x,y) that takes a pair of coordinates x, y and 
+plot it on the canvas.
+
+If you plot(0,0), there should be a small circle in the origin.
+If you plot (1, 1), it should be on the corresponding space on a grid.
+
+
+
+
+"""
+
+
+
+
+
 
 root = tk.Tk()
 root.geometry('600x400')
@@ -29,41 +50,34 @@ main_y1 = 0
 main_x2 = root.winfo_width()
 main_y2 = root.winfo_height()
 
-can_width = canvas.winfo_width()
-can_height = canvas.winfo_height()
 
 crosshair = canvas.create_oval(middle_w - radius, middle_h - radius, middle_w + radius, middle_h + radius, fill="red", outline="blue", width="1")
 
 axis_x = canvas.create_line(main_x1, middle_h, canvas['width'], middle_h, fill="white")
 axis_y = canvas.create_line(middle_w, main_y1, middle_w, canvas['height'], fill="white")
 
-# print(root.winfo_screenwidth)
-# print(root.winfo_screenheight)
 
-# originxx = canvas.create_text(1/2 * int(canvas['width']) + 5, 1/2 * int(canvas['height']) + 5, text="O")
 
 #gridpoints
 ticks = []
-tecks = []
+# tecks = []
 for x in range (int(-middle_w), int(middle_w) + 1, 50):
     ticks.append(canvas.create_line(middle_w + x, int(canvas['height'])/2, middle_w + x + 2, int(canvas['height'])/2, width=10, fill="white")) 
-    tecks.append(canvas.create_text(middle_w + x, int(canvas['height'])/2 + 10, text=str(x)))
+    # tecks.append(canvas.create_text(middle_w + x, int(canvas['height'])/2 + 10, text=str(x)))
 for y in range (int(-middle_h), int(middle_h) + 1, 50):
     ticks.append(canvas.create_line(int(canvas['width'])/2, middle_h + y, int(canvas['width'])/2, middle_h + y + 2, width=10, fill="white")) 
-    tecks.append(canvas.create_text(int(canvas['width'])/2 + 10, middle_h + y, text=str(y), fill="white"))
+    # tecks.append(canvas.create_text(int(canvas['width'])/2 + 10, middle_h + y, text=str(y), fill="white"))
+
+
+
 
 
 def can_resize(event):
-    # new_w = root.winfo_screenwidth()
-    # new_h = root.winfo_screenheight()
-    # can_width = new_w
-    # can_height = new_h
     global crosshair
     global axis_x
     global axis_y
     global ticks
-    global tecks
-    print(root.winfo_width(), root.winfo_height())
+    
     canvas.config(width=root.winfo_width(), height=root.winfo_height())
     canvas.delete(crosshair)
     crosshair = canvas.create_oval(int(canvas['width'])/2 - radius, 
@@ -88,79 +102,33 @@ def can_resize(event):
     #delete all gridpoints and text
     for tick in ticks:
         canvas.delete(tick)
-    for teck in tecks:       
-        canvas.delete(teck)
+    # for teck in tecks:       
+    #     canvas.delete(teck)
 
     ticks = []
-    tecks = []
-
-    #for tick in ticks:
-        #canvas.delete(...)
-
-    # for x in range (int(-middle_w), int(middle_w) + 1, 50):
-    #     #ticks.append(canvas.create_....)
-    #     gridpoint_x = canvas.create_line(middle_w + x, int(canvas['height'])/2, middle_w + x + 2, int(canvas['height'])/2, width=10, fill="white")  
-    #     gridtext_x = canvas.create_text(middle_w + x, int(canvas['height'])/2 + 10, text=str(x), fill="white")
-    # for y in range (int(-middle_h), int(middle_h) + 1, 50):
-    #     gridpoint_y = canvas.create_line(int(canvas['width'])/2, middle_h + y, int(canvas['width'])/2, middle_h + y + 2, width=10, fill="white") 
-    #     gridtext_y = canvas.create_text(int(canvas['width'])/2 + 10, middle_h + y, text=str(y), fill="white")
-
-    #set max and min grid increment
-    #max = 5
-    #min = 50
-
-    #600X400
-    #100% = 50
-    #min = 5
-
-    #600 = 50
-    # 50
-    # 45
-    # 40
-    # 35
-    # 30
-    # 25
-    # 20
-    # 15
-    # 10
-    # 5
-    #1536 = 5
-
-    #get percentage/ratio to determine increments based on window size
-    #round number to nice number divisble by 5
-    
-    #x-axis min=600 max=winfo.screen_width()
-    # increments = x + 5
-    
-    # x = canvas['width']/
-
-    # max = 1536
-    # min = 600
-
-    # diff = 936
-    # percentjohn = (int(canvas['width'])-600) / 936
-    # percentjohn * 45
-
-
-    # DEBUG HERE
-    # DEBUG HERE
-
-    percentjohn = (int(canvas['width'])-600) / 936
-    percentjlee = percentjohn * 45
-    increments = int(percentjlee + 5)
-    
-    # DEBUG HERE
-    # DEBUG HERE
-    
     
 
 
-    for x in range (int(-middle_w), int(middle_w) + 1, increments):
-        ticks.append(canvas.create_line(middle_w + x, int(canvas['height'])/2, middle_w + x + 2, int(canvas['height'])/2, width=10, fill="white")) 
-        tecks.append(canvas.create_text(middle_w + x, int(canvas['height'])/2 + 10, text=str(x), fill="white"))
-    for y in range (int(-middle_h), int(middle_h) + 1, increments):
-        ticks.append(canvas.create_line(int(canvas['width'])/2, middle_h + y, int(canvas['width'])/2, middle_h + y + 2, width=10, fill="white")) 
-        tecks.append(canvas.create_text(int(canvas['width'])/2 + 10, middle_h + y, text=str(y), fill="white"))
+
+
+    x_ticks = 20
+    increments_x = int(canvas['width'])/x_ticks
+
+    y_ticks = 10
+    increments_y = int(canvas['height'])/y_ticks
+
+
+    
+
+    x_coordinates = my_range(0, int(canvas['width']), increments_x)
+    y_coordinates = my_range(0, int(canvas['height']), increments_y)
+
+    for x in x_coordinates:
+        ticks.append(canvas.create_line(x, int(canvas['height'])/2,  x + 2, int(canvas['height'])/2, width=10, fill="white")) 
+    
+    
+    for y in y_coordinates:
+        ticks.append(canvas.create_line(int(canvas['width'])/2, y, int(canvas['width'])/2, y + 2, width=10, fill="white")) 
 root.bind("<Configure>", can_resize)
 
 
@@ -174,12 +142,10 @@ root.bind("<Configure>", can_resize)
 
   
 
-def mouse_print(event):
-    print(event.x, event.y)
+# def mouse_print(event):
+#     print(event.x, event.y)
 
-root.bind("<Button-1>", mouse_print)
-
-
+# root.bind("<Button-1>", mouse_print)
 
 
 
@@ -200,11 +166,6 @@ canvas.place(relx = 0, rely = 0, relwidth = 1, relheight = 1)
 # circle = canvas.create_oval(50, 50, 300, 300, fill="blue")
 
 
-#seems right
-# print(middle_h)
-# print(middle_w)
-# print(can_width)
-# print(can_height)
 
 #parameters of create_ovals (x1,y1) = top left point of box of circle, (x2, y2) = bottom right point of box of circle
 # crosshair.place(relx = 0, rely = 0, relwidth = 1, relheight = 1) does not work
