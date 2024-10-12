@@ -5,10 +5,9 @@
 
 import tkinter as tk
 import time
-import Utilities
+import numpy as np
 
-from Utilities import my_range
-
+from Utilities import my_range, plot, Canvas_2D
 
 """
 Define a function called plot(x,y) that takes a pair of coordinates x, y and 
@@ -17,119 +16,117 @@ plot it on the canvas.
 If you plot(0,0), there should be a small circle in the origin.
 If you plot (1, 1), it should be on the corresponding space on a grid.
 
-
-
-
 """
-
-
-
-
-
 
 root = tk.Tk()
 root.geometry('600x400')
 root.title('3D Engine')
-# root.attributes("-toolwindow", True)
 
-#need to resize canvas so it fits with window size
-#get new coordinates of window by winfo_screenwidth() and winfo_screenheight()
 
 root.minsize(600, 400)
 root.maxsize(1536, 864)
 
 
-canvas = tk.Canvas(root, width=600, height=400, bg='navy')
+# root.attributes("-toolwindow", True)
 
-radius = 50
-middle_w = 1/2 * int(canvas['width'])
-middle_h = 1/2 * int(canvas['height'])
+#need to resize canvas so it fits with window size
+#get new coordinates of window by winfo_screenwidth() and winfo_screenheight()
 
-main_x1 = 0
-main_y1 = 0
-main_x2 = root.winfo_width()
-main_y2 = root.winfo_height()
+points = []
 
-
-crosshair = canvas.create_oval(middle_w - radius, middle_h - radius, middle_w + radius, middle_h + radius, fill="red", outline="blue", width="1")
-
-axis_x = canvas.create_line(main_x1, middle_h, canvas['width'], middle_h, fill="white")
-axis_y = canvas.create_line(middle_w, main_y1, middle_w, canvas['height'], fill="white")
+canvas = Canvas_2D(root, 600, 400, 'DodgerBlue4')
+canvas.draw_axes()
+canvas.draw_ticks()
+canvas.plot_points(0, 0)
+canvas.plot_points(-1, -1)
+canvas.plot_points(1, 1)
 
 
+
+# plot(canvas, 0, 0) 
 
 #gridpoints
-ticks = []
-# tecks = []
-for x in range (int(-middle_w), int(middle_w) + 1, 50):
-    ticks.append(canvas.create_line(middle_w + x, int(canvas['height'])/2, middle_w + x + 2, int(canvas['height'])/2, width=10, fill="white")) 
-    # tecks.append(canvas.create_text(middle_w + x, int(canvas['height'])/2 + 10, text=str(x)))
-for y in range (int(-middle_h), int(middle_h) + 1, 50):
-    ticks.append(canvas.create_line(int(canvas['width'])/2, middle_h + y, int(canvas['width'])/2, middle_h + y + 2, width=10, fill="white")) 
-    # tecks.append(canvas.create_text(int(canvas['width'])/2 + 10, middle_h + y, text=str(y), fill="white"))
+# ticks = []
+# # tecks = []
+# for x in range (int(-middle_w), int(middle_w) + 1, 50):
+#     ticks.append(canvas.create_line(middle_w + x, int(canvas['height'])/2, middle_w + x + 1, int(canvas['height'])/2, width=10, fill="white")) 
+#     # tecks.append(canvas.create_text(middle_w + x, int(canvas['height'])/2 + 10, text=str(x)))
+# for y in range (int(-middle_h), int(middle_h) + 1, 50):
+#     ticks.append(canvas.create_line(int(canvas['width'])/2, middle_h + y, int(canvas['width'])/2, middle_h + y + 1, width=10, fill="white")) 
+#     # tecks.append(canvas.create_text(int(canvas['width'])/2 + 10, middle_h + y, text=str(y), fill="white"))
 
 
 
+# points = []
 
 
-def can_resize(event):
-    global crosshair
-    global axis_x
-    global axis_y
-    global ticks
+# def can_resize(event):
+#     global crosshair
+#     global axis_x
+#     global axis_y
+#     global ticks
+#     global points
     
-    canvas.config(width=root.winfo_width(), height=root.winfo_height())
-    canvas.delete(crosshair)
-    crosshair = canvas.create_oval(int(canvas['width'])/2 - radius, 
-                                    int(canvas['height'])/2 - radius, 
-                                    int(canvas['width'])/2 + radius, 
-                                    int(canvas['height'])/2 + radius, 
-                                    fill="red", outline="blue", width="1")
+#     canvas.config(width=root.winfo_width(), height=root.winfo_height())
+#     canvas.delete(crosshair)
+#     crosshair = canvas.create_oval(int(canvas['width'])/2 - radius, 
+#                                     int(canvas['height'])/2 - radius, 
+#                                     int(canvas['width'])/2 + radius, 
+#                                     int(canvas['height'])/2 + radius, 
+#                                     fill="DodgerBlue4", outline="red", width="1")
     
-    canvas.delete(axis_x, axis_y)
-    axis_x = canvas.create_line(main_x1, int(canvas['height'])/2, 
-                                canvas['width'], 
-                                int(canvas['height'])/2,
-                                fill="black")
-    axis_y = canvas.create_line(int(canvas['width'])/2,
-                                main_y1,
-                                int(canvas['width'])/2,
-                                canvas['height'],
-                                fill="black")
-    # canvas.delete(originxx)
-    # originxx = canvas.create_text(int(canvas['width']/2) + 5, int(canvas['height']/2) + 5, text="O")
+#     canvas.delete(axis_x, axis_y)
+#     axis_x = canvas.create_line(main_x1, int(canvas['height'])/2, 
+#                                 canvas['width'], 
+#                                 int(canvas['height'])/2,
+#                                 fill="black")
+#                                 #, arrow=tk.LAST)
+#     axis_y = canvas.create_line(int(canvas['width'])/2,
+#                                 main_y1,
+#                                 int(canvas['width'])/2,
+#                                 canvas['height'],
+#                                 fill="black")
+#                                 #, arrow=tk.LAST)
+#     # canvas.delete(originxx)
+#     # originxx = canvas.create_text(int(canvas['width']/2) + 5, int(canvas['height']/2) + 5, text="O")
 
-    #delete all gridpoints and text
-    for tick in ticks:
-        canvas.delete(tick)
-    # for teck in tecks:       
-    #     canvas.delete(teck)
-
-    ticks = []
-    
-
-
-
-
-    x_ticks = 20
-    increments_x = int(canvas['width'])/x_ticks
-
-    y_ticks = 10
-    increments_y = int(canvas['height'])/y_ticks
-
+#     #delete all gridpoints and text
+#     for tick in ticks:
+#         canvas.delete(tick)
+#     # for teck in tecks:       
+#     #     canvas.delete(teck)
 
     
+#     for point in points:
+#         canvas.delete(point)
 
-    x_coordinates = my_range(0, int(canvas['width']), increments_x)
-    y_coordinates = my_range(0, int(canvas['height']), increments_y)
+#     x_ticks = 20
+#     increments_x = int(canvas['width'])/x_ticks
 
-    for x in x_coordinates:
-        ticks.append(canvas.create_line(x, int(canvas['height'])/2,  x + 2, int(canvas['height'])/2, width=10, fill="white")) 
+#     y_ticks = 10
+#     increments_y = int(canvas['height'])/y_ticks
+
+
     
+
+#     x_coordinates = my_range(0, int(canvas['width']), increments_x)
+#     y_coordinates = my_range(0, int(canvas['height']), increments_y)
+
+#     for x in x_coordinates:
+#         ticks.append(canvas.create_line(x, int(canvas['height'])/2,  x + 1, int(canvas['height'])/2, width=10, fill="white")) 
+#     for y in y_coordinates:
+#         ticks.append(canvas.create_line(int(canvas['width'])/2, y, int(canvas['width'])/2, y + 1, width=10, fill="white")) 
+
+#     points = []
     
-    for y in y_coordinates:
-        ticks.append(canvas.create_line(int(canvas['width'])/2, y, int(canvas['width'])/2, y + 2, width=10, fill="white")) 
-root.bind("<Configure>", can_resize)
+#     point1 = plot(points, canvas, 0, 0) 
+#     point2 = plot(points, canvas, 1, 1) 
+#     point3 = plot(points, canvas, 6, 0)
+#     point4 = plot(points, canvas, 0, 4)
+#     point5 = plot(points, canvas, 8, -4)
+#     point6 = plot(points, canvas, -4, -2)
+
+# root.bind("<Configure>", can_resize)
 
 
 #create_line multiple times with for loop
