@@ -37,9 +37,10 @@ points = []
 canvas = Canvas_2D(root, 600, 400, 'DodgerBlue4')
 canvas.draw_axes()
 canvas.draw_ticks()
-canvas.plot_points(0, 0)
+canvas.plot_points(-1, 1)
 canvas.plot_points(-1, -1)
 canvas.plot_points(1, 1)
+canvas.plot_points(1, -1)
 
 
 

@@ -2,6 +2,8 @@
 
 from tkinter import *
 import tkinter as tk
+import numpy as np
+from copy import deepcopy
 
 def my_range(start, end, increment):
     current_value = start
@@ -20,8 +22,12 @@ def plot(points, canvas, x, y):
     point = canvas.create_oval(width + radius, height + radius, width - radius, height - radius, fill="black", width="1", outline="")
     points.append(point)
     
-
-
+def my_deep_copy(array):
+    deep_array = []
+    for point in array:
+        deep_array.append(point)
+    return deep_array
+    # return [x for x in array] #John Leung's deepcopy do not steal
 
 class Counter:
     def __init__(self):
@@ -46,20 +52,40 @@ class BetterCounter(Counter):
         print(self.counter)
 
 
+
+
+class point():
+    def __init__(self, x, y):
+        self.x_point = x
+        self.y_point = y
+        #self.z_point = z
+        self.vector = np.array([x, y]).transpose()
+
+    
+    # def rotate():
+
+        
+
+
+
+
+
 class Canvas_2D(Canvas):
     def __init__(self, root, width, height, bg):
         Canvas.__init__(self, master = root, width = width, height = height, bg = bg)        
         self.root = root
         self.middle_w = 1/2 * int(self['width'])
         self.middle_h = 1/2 * int(self['height'])
-        self.root.bind("<Configure>", self.resize_event)
+        # self.root.bind("<Configure>", self.resize_event)
         self.ticks = []
         self.axis_x = 0
         self.axis_y = 0
 
-        self.points = []
+        self.points_current = []
+        self.points_old = []
         self.xcoords = []
         self.ycoords = []
+        self.size = 0
 
 
         self.main_x2 = self.root.winfo_width()
@@ -84,16 +110,31 @@ class Canvas_2D(Canvas):
         self.draw_axes()
 
         for tick in self.ticks:
-            self.delete(tick)
+            self.delete(tick) 
         self.draw_ticks()
-        
-        for point in self.points:
+
+
+        self.points_old = self.points_current
+
+        for point in self.points_current:
             self.delete(point)     # Deletes off the canvas
-        
-        for i in range(len(self.points)):
+            # self.size -= 1
+
+        self.points_current = []
+        temp_xcoords = my_deep_copy(self.xcoords)
+        temp_ycoords = my_deep_copy(self.ycoords)
+
+        for i in range(len(self.ycoords)):     
+            # self.points_old = self.points_current   #only resizes one cus the size of self.points is 1 when it gets deleted
             self.plot_points(self.xcoords[i], self.ycoords[i])
-        
+
+        self.xcoords = temp_xcoords
+        self.ycoords = temp_ycoords
+
+
         #self.points = []        # empty the list
+
+        print(self.xcoords, self.ycoords)
 
     def calculate_middle(self):
         self.middle_w = 1/2 * int(self["width"])
@@ -121,17 +162,19 @@ class Canvas_2D(Canvas):
 
 
     def plot_points(self, x, y):
-        self.points = []
-        self.xcoords = []
-        self.ycoords = []
+        # self.points_current = []
+        # self.xcoords = []
+        # self.ycoords = []
         width = (int(self['width']) / 2) + x*(int(self['width'])/20)
         height = (int(self['height']) / 2) - y*(int(self['height'])/10)
 
         radius = 5
         point = self.create_oval(width + radius, height + radius, width - radius, height - radius, fill="black", width="1", outline="")
-        self.points.append(point)
+        self.points_current.append(point)
+        print(self.points_current)
         self.xcoords.append(x)
         self.ycoords.append(y)
+        # self.size += 1
 
     
         
@@ -153,15 +196,18 @@ class Canvas_2D(Canvas):
 # a.subtract()
 
 if (__name__ == "__main__"):
-    root = tk.Tk()
-    root.geometry('600x400')
-    root.title('3D Engine')
+    # root = tk.Tk()
+    # root.geometry('600x400')
+    # root.title('3D Engine')
 
-    root.minsize(600, 400)
-    root.maxsize(1536, 864)
+    # root.minsize(600, 400)
+    # root.maxsize(1536, 864)
 
-    canvas = Canvas_2D(root, 600, 400, 'White')
+    # canvas = Canvas_2D(root, 600, 400, 'White')
 
-    canvas.place(relx = 0, rely = 0, relwidth = 1, relheight = 1)
+    # canvas.place(relx = 0, rely = 0, relwidth = 1, relheight = 1)
 
-    root.mainloop()
+    # root.mainloop()
+
+    x = point(1,1)
+    print(x.vector)
