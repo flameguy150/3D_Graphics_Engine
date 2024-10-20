@@ -7,7 +7,7 @@ import tkinter as tk
 import time
 import numpy as np
 
-from Utilities import my_range, plot, Canvas_2D
+from Utilities import my_range, Canvas_2D, Point
 
 """
 Define a function called plot(x,y) that takes a pair of coordinates x, y and 
@@ -34,13 +34,20 @@ root.maxsize(1536, 864)
 
 points = []
 
+p1 = Point(1, 0)
+p2 = Point(0, 1)
+p3 = Point(-1, 0)
+p4 = Point(0, -1)
+
 canvas = Canvas_2D(root, 600, 400, 'DodgerBlue4')
 canvas.draw_axes()
 canvas.draw_ticks()
-canvas.plot_points(-1, 1)
-canvas.plot_points(-1, -1)
-canvas.plot_points(1, 1)
-canvas.plot_points(1, -1)
+canvas.plot_points2(p1)
+canvas.plot_points2(p2)
+canvas.plot_points2(p3)
+canvas.plot_points2(p4)
+
+
 
 
 
@@ -94,8 +101,8 @@ canvas.plot_points(1, -1)
 #     #delete all gridpoints and text
 #     for tick in ticks:
 #         canvas.delete(tick)
-#     # for teck in tecks:       
-#     #     canvas.delete(teck)
+#     for teck in tecks:       
+#         canvas.delete(teck)
 
     
 #     for point in points:
