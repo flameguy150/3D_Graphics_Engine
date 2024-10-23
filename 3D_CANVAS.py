@@ -39,6 +39,10 @@ p2 = Point(0, 1)
 p3 = Point(-1, 0)
 p4 = Point(0, -1)
 
+p5 = Point(1,1)
+p6 = Point(-3,2)
+p7 = Point(-4,-4)
+
 canvas = Canvas_2D(root, 600, 400, 'DodgerBlue4')
 canvas.draw_axes()
 canvas.draw_ticks()
@@ -46,6 +50,10 @@ canvas.plot_points2(p1)
 canvas.plot_points2(p2)
 canvas.plot_points2(p3)
 canvas.plot_points2(p4)
+canvas.plot_points2(p5)
+canvas.plot_points2(p6)
+canvas.plot_points2(p7)
+
 
 
 

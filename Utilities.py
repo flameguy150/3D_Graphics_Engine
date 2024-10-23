@@ -69,8 +69,14 @@ class Canvas_2D(Canvas):
         self.main_x2 = self.root.winfo_width()
         self.main_y2 = self.root.winfo_height()
         self.root.bind("<Configure>", self.resize_event)
+        self.root.bind("<Button-1>", self.mouse_click_print)
         self.root.bind("<B1-Motion>", self.mouse_print)
 
+
+        self.old_click_coords_x = 0
+        self.old_click_coords_y = 0
+        self.new_click_coords_x = 0
+        self.new_click_coords_y = 0
 
     def resize_event(self, event):
         # Call this every time we resize the window. 
@@ -172,9 +178,38 @@ class Canvas_2D(Canvas):
         self.points_current = temp_points
 
     def mouse_print(self, event):
+        # old_mouse_click_x = event.x
+        # new_mouse_click_x = event.x
+        
+        self.new_click_coords_x = event.x
+        self.new_click_coords_y = event.y
+
+        # Calculate the difference between the old drag_x and now_x
+        diff = self.new_click_coords_x - self.old_click_coords_x
+        print(diff)
+        self.old_click_coords_x = event.x
+        self.old_click_coords_y = event.y
+        
+        # call rotate on every point in points list by that many (negative) degrees
+
+        for point in self.plotted_points_list:
+            self.delete(point)
+        self.plotted_points_list = []
+
+
+        for point in self.points_current:
+            point.rotate(-(diff))
+
+        temp_points = my_deep_copy(self.points_current)
+        self.points_current = []
+
+        for point in temp_points:
+            self.plot_points2(point)
+
         print(event.x, event.y)
 
-        
+    def mouse_click_print(self, event):
+        print(event.x, event.y)
 if (__name__ == "__main__"):
     # root = tk.Tk()
     # root.geometry('600x400')
