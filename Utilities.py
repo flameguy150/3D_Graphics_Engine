@@ -25,12 +25,13 @@ def my_deep_copy(array):
 
 
 class Point():
-    def __init__(self, x, y):
+    def __init__(self, x, y, z):
         self.canvas_point_id = None
         self.x_point = x
         self.y_point = y
+        self.z_point = z
         #self.z_point = z
-        self.vector = np.array([x, y]).transpose()
+        self.vector = np.array([x, y, z]).transpose()
 
     
     def rotate(self, degree):
@@ -38,6 +39,27 @@ class Point():
         a = np.array([[math.cos(radians), -(math.sin(radians))], 
                      [math.sin(radians), math.cos(radians)]])
         self.vector = np.dot(a, self.vector)
+
+    def rotate_x(self, degree):
+        radians = math.radians(degree)
+        a = np.array([[1, 0, 0], 
+                      [0, math.cos(radians), -(math.sin(radians))], 
+                      [0, math.sin(radians), math.cos(radians)]])
+        self.vector = np.dot(a, self.vector)
+    
+    def rotate_y(self, degree):
+        radians = math.radians(degree)
+        a = np.array([[math.cos(radians), 0, math.sin(radians)], 
+                      [0, 1, 0], 
+                      [-(math.sin(radians)), 0, math.cos(radians)]])
+        self.vector = np.dot(a, self.vector)
+    
+    # def rotate_z(self, degree):
+    #     radians = math.radians(degree)
+    #     a = np.array([[math.cos(radians), -(math.sin(radians)), 0], 
+    #                   [math.sin(radians), math.cos(radians), 0], 
+    #                   [-(math.sin(radians)), 0, math.cos(radians)]])
+    #     self.vector = np.dot(a, self.vector)
 
     def __repr__(self):
         vec = [int(x) for x in self.vector]
@@ -70,7 +92,7 @@ class Canvas_2D(Canvas):
         self.main_y2 = self.root.winfo_height()
         self.root.bind("<Configure>", self.resize_event)
         self.root.bind("<Button-1>", self.mouse_click_print)
-        self.root.bind("<B1-Motion>", self.mouse_print)
+        self.root.bind("<B1-Motion>", self.drag)
 
 
         self.old_click_coords_x = 0
@@ -177,7 +199,7 @@ class Canvas_2D(Canvas):
 
         self.points_current = temp_points
 
-    def mouse_print(self, event):
+    def drag(self, event):
         # old_mouse_click_x = event.x
         # new_mouse_click_x = event.x
         
@@ -185,8 +207,10 @@ class Canvas_2D(Canvas):
         self.new_click_coords_y = event.y
 
         # Calculate the difference between the old drag_x and now_x
-        diff = self.new_click_coords_x - self.old_click_coords_x
-        print(diff)
+        diffx = self.new_click_coords_x - self.old_click_coords_x
+        diffy = self.new_click_coords_y - self.old_click_coords_y
+        print("diffx: " + str(diffx))
+        print("diffy: " + str(diffy))
         self.old_click_coords_x = event.x
         self.old_click_coords_y = event.y
         
@@ -198,7 +222,8 @@ class Canvas_2D(Canvas):
 
 
         for point in self.points_current:
-            point.rotate(-(diff))
+            point.rotate_y(-(diffx))
+            point.rotate_x(-(diffy))
 
         temp_points = my_deep_copy(self.points_current)
         self.points_current = []
@@ -206,10 +231,16 @@ class Canvas_2D(Canvas):
         for point in temp_points:
             self.plot_points2(point)
 
-        print(event.x, event.y)
+        # self.new_click_coords_x = 0
+        # self.new_click_coords_y = 0
+        # self.old_click_coords_x = 0
+        # self.old_click_coords_y = 0
+        #print(event.x, event.y)
 
     def mouse_click_print(self, event):
-        print(event.x, event.y)
+        # print(event.x, event.y)
+        self.old_click_coords_x = event.x
+        self.old_click_coords_y = event.y
 if (__name__ == "__main__"):
     # root = tk.Tk()
     # root.geometry('600x400')
@@ -224,14 +255,5 @@ if (__name__ == "__main__"):
 
     # root.mainloop()
 
-    x = Point(1,0)
-    x.rotate(-90)
-    print(x)
-    x.rotate(-90)
-    print(x)
-    x.rotate(-90)
-    print(x)
-    x.rotate(-90)
-    print(x)
-    x.rotate(360)
-    print(x)
+    x = Point(1,0,0)
+    x.rotate_x(90)
