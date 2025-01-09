@@ -1,8 +1,3 @@
-# In order to put anything on github, you want the following pattern
-# git init once
-# add ., commit, push
-
-
 import tkinter as tk
 import time
 import numpy as np
@@ -46,173 +41,24 @@ p8 = Point(-1, -1, -1)
 
 
 
-import math
+
 
 
 
 canvas = Canvas_2D(root, 600, 400, 'DodgerBlue4')
 canvas.draw_axes()
 canvas.draw_ticks()
-canvas.plot_points2(p1)
-canvas.plot_points2(p2)
-canvas.plot_points2(p3)
-canvas.plot_points2(p4)
-canvas.plot_points2(p5)
-canvas.plot_points2(p6)
-canvas.plot_points2(p7)
-canvas.plot_points2(p8)
 
 
-# for y in my_range(-5, 5, 1/100):
-#     xcoord = math.cos(math.radians((y + 5) * 100))
-#     zcoord = math.sin(math.radians((y + 5) * 100))
-#     point = Point(xcoord, y, zcoord)
-#     canvas.plot_points2(point)
-
-#circle! creating a point every degree around the x and y axis, the double helix makes a circle around the x and z axis while increasing y to give it the illusion of a helix
-# for degree in range(360):
-#     xcoord = math.cos(math.radians(degree))
-#     ycoord = math.sin(math.radians(degree))
-#     point = Point(xcoord, ycoord, 0)
-#     canvas.plot_points2(point)
-
-
-
-# canvas.plot_points2(p7)
-# canvas.plot_points2(p8)
-
-# x = Point(1,0,0)
-
-# x.rotate_x(90)
+#choose size 1-10
+# canvas.create_cube()
+canvas.create_octahedron(4)
 
 
 
 
-# plot(canvas, 0, 0) 
 
-#gridpoints
-# ticks = []
-# # tecks = []
-# for x in range (int(-middle_w), int(middle_w) + 1, 50):
-#     ticks.append(canvas.create_line(middle_w + x, int(canvas['height'])/2, middle_w + x + 1, int(canvas['height'])/2, width=10, fill="white")) 
-#     # tecks.append(canvas.create_text(middle_w + x, int(canvas['height'])/2 + 10, text=str(x)))
-# for y in range (int(-middle_h), int(middle_h) + 1, 50):
-#     ticks.append(canvas.create_line(int(canvas['width'])/2, middle_h + y, int(canvas['width'])/2, middle_h + y + 1, width=10, fill="white")) 
-#     # tecks.append(canvas.create_text(int(canvas['width'])/2 + 10, middle_h + y, text=str(y), fill="white"))
-
-
-
-# points = []
-
-
-# def can_resize(event):
-#     global crosshair
-#     global axis_x
-#     global axis_y
-#     global ticks
-#     global points
-    
-#     canvas.config(width=root.winfo_width(), height=root.winfo_height())
-#     canvas.delete(crosshair)
-#     crosshair = canvas.create_oval(int(canvas['width'])/2 - radius, 
-#                                     int(canvas['height'])/2 - radius, 
-#                                     int(canvas['width'])/2 + radius, 
-#                                     int(canvas['height'])/2 + radius, 
-#                                     fill="DodgerBlue4", outline="red", width="1")
-    
-#     canvas.delete(axis_x, axis_y)
-#     axis_x = canvas.create_line(main_x1, int(canvas['height'])/2, 
-#                                 canvas['width'], 
-#                                 int(canvas['height'])/2,
-#                                 fill="black")
-#                                 #, arrow=tk.LAST)
-#     axis_y = canvas.create_line(int(canvas['width'])/2,
-#                                 main_y1,
-#                                 int(canvas['width'])/2,
-#                                 canvas['height'],
-#                                 fill="black")
-#                                 #, arrow=tk.LAST)
-#     # canvas.delete(originxx)
-#     # originxx = canvas.create_text(int(canvas['width']/2) + 5, int(canvas['height']/2) + 5, text="O")
-
-#     #delete all gridpoints and text
-#     for tick in ticks:
-#         canvas.delete(tick)
-#     for teck in tecks:       
-#         canvas.delete(teck)
-
-    
-#     for point in points:
-#         canvas.delete(point)
-
-#     x_ticks = 20
-#     increments_x = int(canvas['width'])/x_ticks
-
-#     y_ticks = 10
-#     increments_y = int(canvas['height'])/y_ticks
-
-
-    
-
-#     x_coordinates = my_range(0, int(canvas['width']), increments_x)
-#     y_coordinates = my_range(0, int(canvas['height']), increments_y)
-
-#     for x in x_coordinates:
-#         ticks.append(canvas.create_line(x, int(canvas['height'])/2,  x + 1, int(canvas['height'])/2, width=10, fill="white")) 
-#     for y in y_coordinates:
-#         ticks.append(canvas.create_line(int(canvas['width'])/2, y, int(canvas['width'])/2, y + 1, width=10, fill="white")) 
-
-#     points = []
-    
-#     point1 = plot(points, canvas, 0, 0) 
-#     point2 = plot(points, canvas, 1, 1) 
-#     point3 = plot(points, canvas, 6, 0)
-#     point4 = plot(points, canvas, 0, 4)
-#     point5 = plot(points, canvas, 8, -4)
-#     point6 = plot(points, canvas, -4, -2)
-
-# root.bind("<Configure>", can_resize)
-
-
-#create_line multiple times with for loop
-#just need to change x1 and x2 to shift
-#good width for lines is 10, distance for x1 and x2 should be about 2
-
-# gridpoint = canvas.create_line(0, int(canvas['height'])/2, 2, int(canvas['height'])/2, width=10, fill="green")
-# gridpoint = canvas.create_line(10, int(canvas['height'])/2, 12, int(canvas['height'])/2, width=10, fill="green")
-# gridpoint = canvas.create_line(20, int(canvas['height'])/2, 22, int(canvas['height'])/2, width=10, fill="green")
-
-  
-
-# def mouse_print(event):
-#     print(event.x, event.y)
-
-# root.bind("<Button-1>", mouse_print)
-
-
-
-# trying to resize circle to center it when expanding window
-# def resize_oval(circle2):
-#     width = circle
-
-# Don't use pack
-#canvas.pack(anchor=tk.CENTER, expand=True)
-
-# Use canvas.place if you wanna fill the whole window
-# relx and rely changes the shape of the canvas window relative to the main window's INITIAL width and hight
-# relwidth and relheight makes the canvas window follow the main window's relative width and height
 canvas.place(relx = 0, rely = 0, relwidth = 1, relheight = 1)
-
-
-#creating a shape is create_shape(x coordinate, y coordinate,, fill=color) to make shape in window
-# circle = canvas.create_oval(50, 50, 300, 300, fill="blue")
-
-
-
-#parameters of create_ovals (x1,y1) = top left point of box of circle, (x2, y2) = bottom right point of box of circle
-# crosshair.place(relx = 0, rely = 0, relwidth = 1, relheight = 1) does not work
-# print(canvas.coords(crosshair))
-
 
 
 
