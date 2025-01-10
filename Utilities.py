@@ -5,6 +5,8 @@ import tkinter as tk
 import numpy as np
 from copy import deepcopy
 import math
+import time
+i = 20
 
 """
 PYTHON FUNCS
@@ -16,6 +18,13 @@ def my_range(start, end, increment):
         values.append(current_value)
         current_value += increment
     
+    return values
+
+def infinite_range(start):
+    current_value = start
+    values=[]
+    while True:
+        values.append(current_value)
     return values
 
 
@@ -99,6 +108,8 @@ class Canvas_2D(Canvas):
         self.old_click_coords_y = 0
         self.new_click_coords_x = 0
         self.new_click_coords_y = 0
+
+        self.running = False
 
 
 
@@ -186,11 +197,9 @@ class Canvas_2D(Canvas):
         self.delete(self.axis_x, self.axis_y)
         for tick in self.ticks:
             self.delete(tick) 
-        for point in self.plotted_points_list:
-            self.delete(point)
+        self.delete_points()
 
-        for line in self.connected_lines:
-            self.delete(line)
+        self.delete_lines()
 
         # Then we draw them back
         self.draw_axes()
@@ -235,21 +244,19 @@ class Canvas_2D(Canvas):
         # Calculate the difference between the old drag_x and now_x
         diffx = self.new_click_coords_x - self.old_click_coords_x
         diffy = self.new_click_coords_y - self.old_click_coords_y
-        # print("diffx: " + str(diffx))
-        # print("diffy: " + str(diffy))
+        print("diffx: " + str(diffx))
+        print("diffy: " + str(diffy))
         self.old_click_coords_x = event.x
         self.old_click_coords_y = event.y
         
         # call rotate on every point in points list by that many (negative) degrees
 
         #delete every point and lines
-        for point in self.plotted_points_list:
-            self.delete(point) # deleting all canvas ovals
+        self.delete_points()
         self.plotted_points_list = []
         
 
-        for line in self.connected_lines:
-            self.delete(line)
+        self.delete_lines()
         self.connected_lines = []
 
         #rotate
@@ -279,6 +286,56 @@ class Canvas_2D(Canvas):
 
 
 
+    def reset(self):
+        pass#to reset object to initial state before draggin
+
+
+
+    def auto_rotate(self): #maybe have it rotate after every time root updates?
+        #we could bind this function to a key, like spacebar, so that if we continously press it down, it will continue to spin
+        #and then we can have it so tkinter thinks its always pushed down?
+        global i
+        self.running = True
+        while self.running:
+            self.delete_points()
+            self.plotted_points_list = []
+            self.delete_lines()
+            self.connected_lines = []
+
+
+            for point in self.points_current:
+                point.rotate_y(-(.1))
+                # point.rotate_x(-(1))
+
+
+            temp_points = my_deep_copy(self.points_current)
+            self.points_current = []
+
+            temp_lines = my_deep_copy(self.lines_current)
+            self.lines_current = []
+
+            for point in temp_points:
+                self.plot_points2(point)
+            
+            for p1,p2 in temp_lines: #connect_lines needs two Point objs in argument, lines_current should be holding a tuple with the two points objects
+                self.connect_lines(p1, p2)
+            self.update()
+
+        self.running = False
+
+
+    def delete_points(self):
+        for point in self.plotted_points_list:
+            self.delete(point) # deleting all canvas ovals
+        self.plotted_points_list = []
+        
+
+    def delete_lines(self):
+        for line in self.connected_lines:
+            self.delete(line)
+        self.connected_lines = []
+
+
 
 
     def mouse_click_print(self, event):
@@ -291,15 +348,15 @@ class Canvas_2D(Canvas):
 
 
     #creating cube class
-    def create_cube(self):
-        p1 = Point(1, 1, 1)
-        p2 = Point(1, 1, -1)
-        p3 = Point(1, -1, 1)
-        p4 = Point(1, -1, -1)
-        p5 = Point(-1, 1, 1)
-        p6 = Point(-1, 1, -1)
-        p7 = Point(-1, -1, 1)
-        p8 = Point(-1, -1, -1)
+    def create_cube(self, x, y, size):
+        p1 = Point( x+(1)*size, y+(1)*size, 1*size)
+        p2 = Point( x+(1)*size, y+(1)*size, -1*size)
+        p3 = Point( x+(1)*size, y+(-1)*size, 1*size)
+        p4 = Point( x+(1)*size, y+(-1)*size, -1*size)
+        p5 = Point( x+(-1)*size,y+( 1)*size, 1*size)
+        p6 = Point( x+(-1)*size,y+( 1)*size, -1*size)
+        p7 = Point( x+(-1)*size,y+( -1)*size, 1*size)
+        p8 = Point( x+(-1)*size,y+( -1)*size, -1*size)
 
         cube_points = [p1, p2, p3, p4, p5, p6, p7, p8]
         for point in cube_points:
@@ -313,13 +370,13 @@ class Canvas_2D(Canvas):
             self.connect_lines(p1, p2)
         
     
-    def create_octahedron(self, size): # should also have an argument to ctrl size
-        p1 = Point(0*size, 1*size, 0*size)
-        p2 = Point(1*size, 0*size, 0*size)
-        p3 = Point(0*size, 0*size, -1*size)
-        p4 = Point(-1*size, 0*size, 0*size)
-        p5 = Point(0*size, 0*size, 1*size)
-        p6 = Point(0*size, -1*size, 0*size)
+    def create_octahedron(self,x, y, size): # should also have an argument to ctrl size
+        p1 = Point(x+(0)*size, y + (1)*size, 0*size)
+        p2 = Point(x+(1)*size, y + (0)*size, 0*size)
+        p3 = Point(x+(0)*size, y + (0)*size, -1*size)
+        p4 = Point(x+(-1)*size,y + (0) *size, 0*size)
+        p5 = Point(x+(0)*size, y + (0)*size, 1*size)
+        p6 = Point(x+(0)*size, y + (-1) *size, 0*size)
 
         octahedron_pts = [p1, p2, p3, p4, p5, p6]
         for pt in octahedron_pts:

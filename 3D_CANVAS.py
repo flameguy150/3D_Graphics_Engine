@@ -1,6 +1,7 @@
 import tkinter as tk
 import time
-import numpy as np
+import numpy as np # py -m pip install (wtv package)
+
 
 from Utilities import my_range, Canvas_2D, Point
 
@@ -51,17 +52,13 @@ canvas.draw_ticks()
 
 
 #choose size 1-10
-# canvas.create_cube()
-canvas.create_octahedron(4)
-
-
-
+canvas.create_cube(-2, -2, 2)
+canvas.create_octahedron(3, 3, 2)
 
 
 canvas.place(relx = 0, rely = 0, relwidth = 1, relheight = 1)
 
-
-
+canvas.auto_rotate()
 
 root.mainloop()
 
