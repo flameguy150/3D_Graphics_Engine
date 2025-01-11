@@ -6,6 +6,10 @@ import numpy as np
 from copy import deepcopy
 import math
 import time
+
+
+
+from colors import beautiful_colors
 i = 20
 
 """
@@ -89,6 +93,7 @@ class Canvas_2D(Canvas):
         self.ticks = []
         self.axis_x = 0
         self.axis_y = 0
+        self.color = bg
 
         self.points_current = [] # array of Points (the object guys we made that have rotate in them)
         self.plotted_points_list = [] # array of canvas.points (the little circles)
@@ -97,8 +102,8 @@ class Canvas_2D(Canvas):
         self.connected_lines = [] # array of canvas lines (type sht)
         self.lines_current = [] # array of points to connect
 
-        self.main_x2 = self.root.winfo_width()
-        self.main_y2 = self.root.winfo_height()
+        self.width = self.root.winfo_width()
+        self.height = self.root.winfo_height()
         self.root.bind("<Configure>", self.resize_event)
         self.root.bind("<Button-1>", self.mouse_click_print)
         self.root.bind("<B1-Motion>", self.drag)
@@ -110,6 +115,15 @@ class Canvas_2D(Canvas):
         self.new_click_coords_y = 0
 
         self.running = False
+        print(self.color)
+
+    def append_color(self):
+        beautiful_colors.append(self.color)
+
+
+    def my_create_rectangle(self, x1, y1, x2, y2, outline, bg, width):
+        # pass #create rectangle
+        self.create_rectangle(x1, y1, x2, y2, outline= outline, fill=bg, width = width)
 
 
 
@@ -191,6 +205,10 @@ class Canvas_2D(Canvas):
         # Call this every time we resize the window. 
 
         self.config(width=self.root.winfo_width(), height=self.root.winfo_height())
+        self.width = self.winfo_width()
+        self.height = self.winfo_height()
+
+        
         self.calculate_middle()
 
         # We delete all the objects on the window
@@ -244,8 +262,8 @@ class Canvas_2D(Canvas):
         # Calculate the difference between the old drag_x and now_x
         diffx = self.new_click_coords_x - self.old_click_coords_x
         diffy = self.new_click_coords_y - self.old_click_coords_y
-        print("diffx: " + str(diffx))
-        print("diffy: " + str(diffy))
+        # print("diffx: " + str(diffx))
+        # print("diffy: " + str(diffy))
         self.old_click_coords_x = event.x
         self.old_click_coords_y = event.y
         
@@ -291,7 +309,7 @@ class Canvas_2D(Canvas):
 
 
 
-    def auto_rotate(self): #maybe have it rotate after every time root updates?
+    def auto_rotate(self, x =None, y =None, speed = None, left = None, right = None): #maybe have it rotate after every time root updates?
         #we could bind this function to a key, like spacebar, so that if we continously press it down, it will continue to spin
         #and then we can have it so tkinter thinks its always pushed down?
         global i
@@ -302,11 +320,37 @@ class Canvas_2D(Canvas):
             self.delete_lines()
             self.connected_lines = []
 
+            if left == None:  #turn right
+                if y == None: #rotate around y axis
+                    for point in self.points_current:
+                        point.rotate_y(-(speed))#turn right
 
-            for point in self.points_current:
-                point.rotate_y(-(.1))
-                # point.rotate_x(-(1))
+                elif x == None: #rotate around x axis
+                    for point in self.points_current:
+                        point.rotate_x(-(speed))#turn right
 
+                else: #rotate around both
+                    for point in self.points_current:
+                        point.rotate_y(-(speed))
+                        point.rotate_x(-(speed)) #right
+            elif right == None:
+                if y == None: #rotate around y axis
+                    for point in self.points_current:
+                        point.rotate_y(-(-speed))#turn left
+
+                elif x == None: #rotate around x axis
+                    for point in self.points_current:
+                        point.rotate_x(-(-speed))#turn left
+
+                else: #rotate around both
+                    for point in self.points_current:
+                        point.rotate_y(-(-speed))
+                        point.rotate_x(-(-speed)) #left
+            
+
+                       
+            
+                
 
             temp_points = my_deep_copy(self.points_current)
             self.points_current = []
@@ -353,10 +397,10 @@ class Canvas_2D(Canvas):
         p2 = Point( x+(1)*size, y+(1)*size, -1*size)
         p3 = Point( x+(1)*size, y+(-1)*size, 1*size)
         p4 = Point( x+(1)*size, y+(-1)*size, -1*size)
-        p5 = Point( x+(-1)*size,y+( 1)*size, 1*size)
-        p6 = Point( x+(-1)*size,y+( 1)*size, -1*size)
-        p7 = Point( x+(-1)*size,y+( -1)*size, 1*size)
-        p8 = Point( x+(-1)*size,y+( -1)*size, -1*size)
+        p5 = Point( x+(-1)*size, y+( 1)*size, 1*size)
+        p6 = Point( x+(-1)*size, y+( 1)*size, -1*size)
+        p7 = Point( x+(-1)*size, y+( -1)*size, 1*size)
+        p8 = Point( x+(-1)*size, y+( -1)*size, -1*size)
 
         cube_points = [p1, p2, p3, p4, p5, p6, p7, p8]
         for point in cube_points:
@@ -370,7 +414,7 @@ class Canvas_2D(Canvas):
             self.connect_lines(p1, p2)
         
     
-    def create_octahedron(self,x, y, size): # should also have an argument to ctrl size
+    def create_octahedron(self, x, y, size): # should also have an argument to ctrl size
         p1 = Point(x+(0)*size, y + (1)*size, 0*size)
         p2 = Point(x+(1)*size, y + (0)*size, 0*size)
         p3 = Point(x+(0)*size, y + (0)*size, -1*size)
@@ -389,6 +433,82 @@ class Canvas_2D(Canvas):
         
         for p1, p2 in edges:
             self.connect_lines(p1, p2)
+    
+    def create_triprism(self, x, y, size):
+        p1 = Point(x+(0)*size, y + (1)*size, (-1)*size)
+        p2 = Point(x+(-1)*size, y + (0)*size, (-1)*size)
+        p3 = Point(x+(1)*size, y + (0)*size, (-1)*size)
+        p4 = Point(x+(0)*size, y + (1)*size, (1)*size)
+        p5 = Point(x+(-1)*size, y + (0)*size, (1)*size)
+        p6 = Point(x+(1)*size, y + (0)*size, (1)*size)
+
+        octahedron_pts = [p1, p2, p3, p4, p5, p6]
+        for pt in octahedron_pts:
+            self.plot_points2(pt)
+        
+        edges = [(p1, p2), (p2, p3), (p3, p1), 
+                 (p1, p4), (p2, p5), (p3, p6),
+                 (p4, p5), (p5, p6), (p6, p4)
+        ]
+        for p1, p2 in edges:
+            self.connect_lines(p1, p2)
+
+    
+    def create_star(self, x, y, size):
+        p1 = Point(x+(0)*size, y + (2)*size, (0)*size)
+        p2 = Point(x+(-.75)*size, y + (.75)*size, (0)*size)
+        p3 = Point(x+(-2)*size, y + (0)*size, (0)*size)
+        p4 = Point(x+(-1)*size, y + (-.5)*size, (0)*size)
+        p5 = Point(x+(-1.2)*size, y + (-2)*size, (0)*size)
+        p6 = Point(x+(0)*size, y + (-1)*size, (0)*size)
+        p7 = Point(x+(1.2)*size, y + (-2)*size, (0)*size)
+        p8 = Point(x+(1)*size, y + (-.5)*size, (0)*size)
+        p9 = Point(x+(2)*size, y + (0)*size, (0)*size)
+        p10 = Point(x+(.75)*size, y + (.75)*size, (0)*size)
+
+
+        # p11 = Point(x+(-.2)*size, y + (.5)*size, (0)*size)
+        # p12 = Point(x+(.2)*size, y + (.5)*size, (0)*size)
+        # p13 = Point(x+(-.6)*size, y + (0)*size, (0)*size)
+        # p14 = Point(x+(-.3)*size, y + (-.3)*size, (0)*size)
+        # p15 = Point(x+(0)*size, y + (-.4)*size, (0)*size)
+        # p16 = Point(x+(.3)*size, y + (-.3)*size, (0)*size)
+        # p17 = Point(x+(.6)*size, y + (0)*size, (0)*size)
+        
+        
+
+        octahedron_pts = [p1, p2, p3, p4, p5, p6, p7, p8, p9, p10,
+                        #    p11, p12, p13, p14, p15, p16, p17
+                        ]
+        for pt in octahedron_pts:
+            self.plot_points2(pt)
+        
+        edges = [(p1, p2), (p2, p3), (p3, p4), 
+                 (p4, p5), (p5, p6), (p6, p7),
+                 (p7, p8), (p8, p9), (p9, p10),
+                 (p10, p1)
+        ]
+        for p1, p2 in edges:
+            self.connect_lines(p1, p2)
+
+    """
+        TERRAIN GRID   TERRAIN GRID   TERRAIN GRID   TERRAIN GRID
+
+    """
+
+    def terrain_grid(self):
+        w_fact = int(self.width / 20) #600/20 =30 
+        h_fact = int(self.height / 20) #400/20 = 20
+        for i in range(w_fact): 
+            for j in range(h_fact): 
+                x1 = 20*i
+                y1 = 20*j
+                x2 = 20*i
+                y2 = 20 + 20*j
+                #x1, y1, x2, y2, outline, bg, width
+                rect2 = self.create_rectangle(x1, y1, x2, y2, 'white', 'black', 2)
+                
+
 
 if (__name__ == "__main__"):
 
