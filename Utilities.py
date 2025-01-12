@@ -6,11 +6,15 @@ import numpy as np
 from copy import deepcopy
 import math
 import time
+from colors import colors
+import random
 
 
+beautiful_colors = ['snow', 'white', 'lavender', 'steel blue', 'ivory2', 'indian red', 'dark sea green', 'MediumOrchid1', 'SkyBlue4']
 
-from colors import beautiful_colors
 i = 20
+rradians_x = 0
+rradians_y = 0
 
 """
 PYTHON FUNCS
@@ -51,32 +55,78 @@ class Point():
         self.z = z
         self.vector = np.array([x, y, z]).transpose()
 
+        self.originalpts = []
+        self.currentpts = []
+
+        # self.radians = 0
+
     
     def rotate(self, degree):
         radians = math.radians(degree)
         a = np.array([[math.cos(radians), -(math.sin(radians))], 
                      [math.sin(radians), math.cos(radians)]])
         self.vector = np.dot(a, self.vector)
+        
+        # print(self.currentpts)
+        # print(radians)
+
 
     def rotate_x(self, degree):
+        global rradians_x
+
         radians = math.radians(degree)
         a = np.array([[1, 0, 0], 
                       [0, math.cos(radians), -(math.sin(radians))], 
                       [0, math.sin(radians), math.cos(radians)]])
         self.vector = np.dot(a, self.vector)
+        self.currentpts = self.vector.tolist()
+        # print(self.currentpts)
+        # print(radians)
+        rradians_x += degree
+
     
     def rotate_y(self, degree):
+        global rradians_y
+        
         radians = math.radians(degree)
         a = np.array([[math.cos(radians), 0, math.sin(radians)], 
                       [0, 1, 0], 
                       [-(math.sin(radians)), 0, math.cos(radians)]])
         self.vector = np.dot(a, self.vector)
+        self.currentpts = self.vector.tolist()
+        rradians_y += degree
     
 
     def __repr__(self):
         vec = [int(x) for x in self.vector]
         return str(vec)
 
+# class Buttons():
+    # def __init__(self, root, text, command, location):
+    #     tk.Button.__init__(self, master = root)
+    #     self.root = root
+    #     self.text = text
+    #     self.command = command
+    #     self.location = location
+        
+        
+    
+    # def create_button(self, root2, text2, command2, location2, bind = None):
+    #     button_ = tk.Button(root2, text = text2, command=command2)
+    #     button_.pack(side = location2)
+    #     if bind != None:
+    #         self.bind('<ButtonPress-1>', self.start)
+    #         self.bind('<ButtonRelease-1>', self.stop)
+
+    # def start(self, event=None):
+    #     if self.command is not None:
+    #         self.command()
+    #         if self.timeout is not None:
+    #             self.timer = self.after(self.timeout, self.start)
+
+    # def stop(self, event=None):
+    #     self.after_cancel(self.timer)
+    
 
 
 
@@ -97,10 +147,12 @@ class Canvas_2D(Canvas):
 
         self.points_current = [] # array of Points (the object guys we made that have rotate in them)
         self.plotted_points_list = [] # array of canvas.points (the little circles)
-        self.xcoords = []
-        self.ycoords = []
         self.connected_lines = [] # array of canvas lines (type sht)
         self.lines_current = [] # array of points to connect
+
+        self.buttons = [] #all buttons to hide and reshow
+        self.button_packs = [] # to reshow all buttons with proper locations
+        self.button_anchors = []
 
         self.width = self.root.winfo_width()
         self.height = self.root.winfo_height()
@@ -115,13 +167,26 @@ class Canvas_2D(Canvas):
         self.new_click_coords_y = 0
 
         self.running = False
-        print(self.color)
+        self.rotspeed = .3
 
-    def append_color(self):
-        beautiful_colors.append(self.color)
+        self.ticks_drawn = False
+        self.axis_drawn = False
+
+        self.btns_hidden = False
+
+        self.glitching = False
+
+        self.print_color()
+        
+
+    def mouse_click_print(self, event):
+        # print(event.x, event.y)
+        self.old_click_coords_x = event.x
+        self.old_click_coords_y = event.y
 
 
-    def my_create_rectangle(self, x1, y1, x2, y2, outline, bg, width):
+
+    def my_create_rectangle(self, x1, y1, x2, y2, outline, bg, width):#dont really need this lol
         # pass #create rectangle
         self.create_rectangle(x1, y1, x2, y2, outline= outline, fill=bg, width = width)
 
@@ -138,9 +203,11 @@ class Canvas_2D(Canvas):
         # Draw the two axes
         self.axis_x = self.create_line(0, self.middle_h, self['width'], self.middle_h, fill="white")
         self.axis_y = self.create_line(self.middle_w, 0, self.middle_w, self['height'], fill="white")
+        self.axis_drawn = True
 
     def draw_ticks(self):
         # Draw tick marks on the axes of the Canvas
+
         self.ticks = []
         x_ticks = 20
         increments_x = int(self['width'])/x_ticks
@@ -154,6 +221,8 @@ class Canvas_2D(Canvas):
             self.ticks.append(self.create_line(x, int(self['height'])/2,  x + 1, int(self['height'])/2, width=10, fill="white")) 
         for y in y_coordinates:
             self.ticks.append(self.create_line(int(self['width'])/2, y, int(self['width'])/2, y + 1, width=10, fill="white")) 
+        
+        self.ticks_drawn = True
 
 
     
@@ -170,10 +239,12 @@ class Canvas_2D(Canvas):
 
         radius = 5
         plotted_point = self.create_oval(width + radius, height + radius, width - radius, height - radius, fill="black", width="1", outline="")
+        point.originalpts = point.vector.tolist()
         self.plotted_points_list.append(plotted_point) #do this bc we need to delete the canvas ovals later on
         self.points_current.append(point)#do this so we can redraw every Point object with their respective vectors
-        self.xcoords.append(x)
-        self.ycoords.append(y)
+        
+        # print(point.originalpts)
+        
     
     #connecting lines of shape objects
     #need to make it resized with window and rotate with shape/points
@@ -211,17 +282,23 @@ class Canvas_2D(Canvas):
         
         self.calculate_middle()
 
+        self.delete_axis()
+        self.delete_ticks()
+
+        if self.axis_drawn == True: #we redraw
+            self.draw_axes()
+            self.draw_ticks()
+        elif self.axis_drawn == False:
+            self.axis_drawn = False
+            self.ticks_drawn = False
+
         # We delete all the objects on the window
-        self.delete(self.axis_x, self.axis_y)
-        for tick in self.ticks:
-            self.delete(tick) 
+        
         self.delete_points()
 
         self.delete_lines()
 
         # Then we draw them back
-        self.draw_axes()
-        self.draw_ticks()
         self.redraw_points()
         self.redraw_lines()
 
@@ -251,8 +328,8 @@ class Canvas_2D(Canvas):
 
 
 
-
     def drag(self, event):
+
         # old_mouse_click_x = event.x
         # new_mouse_click_x = event.x
         
@@ -283,17 +360,12 @@ class Canvas_2D(Canvas):
             point.rotate_x(-(diffy))
 
 
-
-
-
         #deepcopy so that the list doesnt expand forever
         temp_points = my_deep_copy(self.points_current)
         self.points_current = []
 
         temp_lines = my_deep_copy(self.lines_current)
         self.lines_current = []
-
-
 
 
         for point in temp_points:
@@ -304,48 +376,141 @@ class Canvas_2D(Canvas):
 
 
 
-    def reset(self):
-        pass#to reset object to initial state before draggin
+        """
+        BUTTONS BUTTONS   BUTTONS   BUTTONS BUTTON BUTTONS BUTTONS
+
+        """
+    
+    def hide_buttons(self):
+        if self.btns_hidden: #buttons are hidden, we redraw bts
+            for button in self.buttons: 
+                if button.cget("text") != "☰":
+                    for pack2 in self.button_packs:
+                        for anchor in self.button_anchors:
+                            button.pack(side = pack2, anchor = anchor)
+            self.btns_hidden = False
+
+        else: #if buttns are shown, we hide
+            for button in self.buttons:
+                if button.cget("text") != "☰":
+                    button.pack_forget() #forgets the pack of btns, does not delete btn
+            self.btns_hidden = True
 
 
+    def hide_cordplane(self):
+        if self.axis_drawn == True and self.ticks_drawn == True:
+            self.delete_axis()
+            self.axis_drawn = False
+            self.delete_ticks()
+            self.ticks_drawn = False
+        else:
+            self.draw_axes()
+            self.draw_ticks()
 
-    def auto_rotate(self, x =None, y =None, speed = None, left = None, right = None): #maybe have it rotate after every time root updates?
+    def create_button(self, root2, text2, command2, location2, anchor, bind):
+        button_ = tk.Button(root2, text = text2, command=command2)
+        button_.pack(side = location2, anchor=anchor)
+        # if bind != None:
+        #     button_.bind('<ButtonPress-1>',self.start_press)
+        #     button_.bind('<ButtonRelease-1>',self.stop_press)
+        self.update()
+        if button_.cget("text") != "☰":
+            self.button_packs.append(location2)
+            self.button_anchors.append(anchor)
+        self.buttons.append(button_)
+    
+    def start_press(self, event):
+        self.button_running = True
+        while self.button_running == True:
+            self.after(self.interval, self.start_press)
+
+    def stop_press(self, event):
+        self.button_running = False
+
+
+    def print_color(self):
+        print(self.color)
+        
+
+    def random_color(self):
+        global beautiful_colors
+        size = len(beautiful_colors)
+        if size == 0:
+            beautiful_colors = ['lavender', 'steel blue', 'ivory2', 'indian red', 'dark sea green', 'MediumOrchid1', 'SkyBlue4']
+        
+        new_color = random.choice(beautiful_colors)
+        beautiful_colors.remove(new_color)
+        return new_color
+
+
+    def append_color(self, color):
+        global beautiful_colors
+        if color not in beautiful_colors:
+            beautiful_colors.append(self.color)
+            print("appending " + self.color + "!")
+        else:
+            print("already in list!")
+    
+
+    def switch_bg_color(self):
+        #self.config(width=self.root.winfo_width(), height=self.root.winfo_height())
+        #random.uniform(colors)
+        new_color = self.random_color()
+        self.config(bg = new_color)
+        self.color = new_color
+        self.print_color()
+
+    def glitch_effect(self):
+        if self.glitching == False:
+            self.glitching = True
+        else:
+            self.glitching = False
+
+    def auto_rotate(self, x =None, y =None, left = None, right = None): #maybe have it rotate after every time root updates?
         #we could bind this function to a key, like spacebar, so that if we continously press it down, it will continue to spin
         #and then we can have it so tkinter thinks its always pushed down?
         global i
         self.running = True
+
+
         while self.running:
             self.delete_points()
             self.plotted_points_list = []
             self.delete_lines()
             self.connected_lines = []
 
+            if self.glitching == True: #if glitch btn is pressed 
+                    self.update()
+            
             if left == None:  #turn right
                 if y == None: #rotate around y axis
                     for point in self.points_current:
-                        point.rotate_y(-(speed))#turn right
+                        point.rotate_y(-(self.rotspeed))#turn right
 
                 elif x == None: #rotate around x axis
                     for point in self.points_current:
-                        point.rotate_x(-(speed))#turn right
+                        point.rotate_x(-(self.rotspeed))#turn right
+                        print("hello")
 
                 else: #rotate around both
                     for point in self.points_current:
-                        point.rotate_y(-(speed))
-                        point.rotate_x(-(speed)) #right
+                        point.rotate_y(-(self.rotspeed))
+                        point.rotate_x(-(self.rotspeed)) #right
+                        #self.update() #VERY COOL GLITCHY EFFECT
+                        print(self.rotspeed)
             elif right == None:
                 if y == None: #rotate around y axis
                     for point in self.points_current:
-                        point.rotate_y(-(-speed))#turn left
+                        point.rotate_y(-(-self.rotspeed))#turn left
 
                 elif x == None: #rotate around x axis
                     for point in self.points_current:
-                        point.rotate_x(-(-speed))#turn left
+                        point.rotate_x(-(-self.rotspeed))#turn left
 
                 else: #rotate around both
                     for point in self.points_current:
-                        point.rotate_y(-(-speed))
-                        point.rotate_x(-(-speed)) #left
+                        point.rotate_y(-(-self.rotspeed))
+                        point.rotate_x(-(-self.rotspeed)) #left
             
 
                        
@@ -357,15 +522,55 @@ class Canvas_2D(Canvas):
 
             temp_lines = my_deep_copy(self.lines_current)
             self.lines_current = []
-
+            
             for point in temp_points:
                 self.plot_points2(point)
             
             for p1,p2 in temp_lines: #connect_lines needs two Point objs in argument, lines_current should be holding a tuple with the two points objects
                 self.connect_lines(p1, p2)
+            # time.sleep(.01)
             self.update()
+            # self.update_idletasks()
+    def increase_rotate_speed(self):
+        self.rotspeed += .05
+        self.auto_rotate(x = 1, y = 1, right = 1)
 
+    def decrease_rotate_speed(self):
+        self.rotspeed -= .05
+        self.auto_rotate(x = 1, y = 1, right = 1)
+
+    def stop_rotate(self):
         self.running = False
+        self.update()
+        
+
+    def initial_state(self):#need2complete
+        global rradians_x
+        global rradians_y
+        #i would have to store the initial state of the points, 
+        #then find the current state and find the diff = current-initial
+        #FINALLY rotate the points by that much
+
+        for point in self.points_current:
+            diff_x = rradians_x
+            diff_y = rradians_y
+            point.rotate_x(-(diff_x))
+            point.rotate_y(-(diff_y))
+            print("ogogogo")
+        
+        rradians_x = 0
+        rradians_y = 0
+
+
+        self.update()
+
+
+
+        """
+        BUTTONS BUTTONS   BUTTONS   BUTTONS BUTTON BUTTONS BUTTONS
+        
+        """
+
 
 
     def delete_points(self):
@@ -379,14 +584,12 @@ class Canvas_2D(Canvas):
             self.delete(line)
         self.connected_lines = []
 
+    def delete_axis(self):
+        self.delete(self.axis_x, self.axis_y)
 
-
-
-    def mouse_click_print(self, event):
-        # print(event.x, event.y)
-        self.old_click_coords_x = event.x
-        self.old_click_coords_y = event.y
-
+    def delete_ticks(self):
+        for tick in self.ticks:
+            self.delete(tick) 
 
 
 
@@ -404,6 +607,7 @@ class Canvas_2D(Canvas):
 
         cube_points = [p1, p2, p3, p4, p5, p6, p7, p8]
         for point in cube_points:
+            point.originalpts.append(point)
             self.plot_points2(point)
 
         edges = [(p1, p2), (p2, p6), (p6, p5), (p5, p1), 
@@ -424,6 +628,7 @@ class Canvas_2D(Canvas):
 
         octahedron_pts = [p1, p2, p3, p4, p5, p6]
         for pt in octahedron_pts:
+            pt.originalpts.append(pt)
             self.plot_points2(pt)
         
         edges = [(p1, p2), (p1, p3), (p1, p4), (p1, p5), 
@@ -442,8 +647,9 @@ class Canvas_2D(Canvas):
         p5 = Point(x+(-1)*size, y + (0)*size, (1)*size)
         p6 = Point(x+(1)*size, y + (0)*size, (1)*size)
 
-        octahedron_pts = [p1, p2, p3, p4, p5, p6]
-        for pt in octahedron_pts:
+        triprism_pts = [p1, p2, p3, p4, p5, p6]
+        for pt in triprism_pts:
+            pt.originalpts.append(pt)
             self.plot_points2(pt)
         
         edges = [(p1, p2), (p2, p3), (p3, p1), 
@@ -481,7 +687,9 @@ class Canvas_2D(Canvas):
                         #    p11, p12, p13, p14, p15, p16, p17
                         ]
         for pt in octahedron_pts:
+            pt.originalpts.append(pt)
             self.plot_points2(pt)
+            
         
         edges = [(p1, p2), (p2, p3), (p3, p4), 
                  (p4, p5), (p5, p6), (p6, p7),
@@ -491,22 +699,7 @@ class Canvas_2D(Canvas):
         for p1, p2 in edges:
             self.connect_lines(p1, p2)
 
-    """
-        TERRAIN GRID   TERRAIN GRID   TERRAIN GRID   TERRAIN GRID
 
-    """
-
-    def terrain_grid(self):
-        w_fact = int(self.width / 20) #600/20 =30 
-        h_fact = int(self.height / 20) #400/20 = 20
-        for i in range(w_fact): 
-            for j in range(h_fact): 
-                x1 = 20*i
-                y1 = 20*j
-                x2 = 20*i
-                y2 = 20 + 20*j
-                #x1, y1, x2, y2, outline, bg, width
-                rect2 = self.create_rectangle(x1, y1, x2, y2, 'white', 'black', 2)
                 
 
 

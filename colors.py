@@ -1,4 +1,5 @@
 import tkinter as tk
+# from Utilities import beautiful_colors
 colors  = ['snow', 'ghost white', 'white smoke', 'gainsboro', 'floral white', 'old lace',
     'linen', 'antique white', 'papaya whip', 'blanched almond', 'bisque', 'peach puff',
     'navajo white', 'lemon chiffon', 'mint cream', 'azure', 'alice blue', 'lavender',
@@ -76,4 +77,3 @@ colors  = ['snow', 'ghost white', 'white smoke', 'gainsboro', 'floral white', 'o
     'gray84', 'gray85', 'gray86', 'gray87', 'gray88', 'gray89', 'gray90', 'gray91', 'gray92',
     'gray93', 'gray94', 'gray95', 'gray97', 'gray98', 'gray99']
 
-beautiful_colors = ['lavender', 'steel blue', 'ivory2', 'indian red', 'dark sea green']
