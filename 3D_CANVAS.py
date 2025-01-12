@@ -1,20 +1,28 @@
 import tkinter as tk
 import time
 import numpy as np # py -m pip install (wtv package)
-from pygame import mixer
+
 import random
+import os
+
 
 
 
 from Utilities import my_range, Canvas_2D, Point, beautiful_colors
-from colors import colors
+
+# Access utilities.py
+colors = os.path.join("tkinter_sound_colors", "colors.py")
+
+
+# Access soundtrack.mp3
+
 
 """
-Define a function called plot(x,y) that takes a pair of coordinates x, y and 
-plot it on the canvas.
+TODO: 
+animation func
+transparent option
+camera , accessing z axis view?
 
-If you plot(0,0), there should be a small circle in the origin.
-If you plot (1, 1), it should be on the corresponding space on a grid.
 
 """
 
@@ -49,17 +57,7 @@ root.wm_attributes("-transparentcolor", "snow")
 
 root.minsize(600, 400)
 root.maxsize(1536, 864)
-# Starting the mixer 
-mixer.init() 
-  
-# Loading the song 
-mixer.music.load("piano_soundtrack_-_isolation.mp3") 
-  
-# Setting the volume 
-mixer.music.set_volume(0.7) 
-  
-# Start playing the song 
-mixer.music.play(-1, 0.0) 
+
 
 
 # root.attributes("-toolwindow", True)
@@ -165,6 +163,10 @@ initial_state_bt = canvas.create_button( root, "Reset", lambda: canvas.initial_s
 incspeed_bt = canvas.create_button(root, "+ speed", lambda: canvas.increase_rotate_speed(), 'top', 'nw', True)
 
 decspeed_bt = canvas.create_button(root, "- speed", lambda: canvas.decrease_rotate_speed(), 'top', 'nw', True)
+
+music_bt = canvas.create_button(root, "change_music", lambda: canvas.switch_music(), 'top', 'nw', True)
+
+mute_bt = canvas.create_button(root, "pause music", lambda: canvas.pause_music(), 'top', 'nw', True)
 
 
 hide_cplane_bt = canvas.create_button(root, "hide coordinate plane", lambda: canvas.hide_cordplane(), 'top', 'nw', False)

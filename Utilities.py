@@ -6,8 +6,23 @@ import numpy as np
 from copy import deepcopy
 import math
 import time
-from colors import colors
 import random
+import os
+from pygame import mixer
+
+# Access utilities.py
+colors = os.path.join("tkinter_sound_colors", "colors.py")
+
+song1 = os.path.join("tkinter_sound_colors", "piano_soundtrack_-_isolation.mp3")
+song2 = os.path.join("tkinter_sound_colors", "lofi_replus.mp3")
+
+music = [song1, song2]
+
+# Starting the mixer 
+mixer.init() 
+
+
+
 
 
 beautiful_colors = ['snow', 'white', 'lavender', 'steel blue', 'ivory2', 'indian red', 'dark sea green', 'MediumOrchid1', 'SkyBlue4']
@@ -46,6 +61,7 @@ def my_deep_copy(array):
 """
 PYTHON FUNCS
 """
+
 
 class Point():
     def __init__(self, x, y, z):
@@ -175,6 +191,14 @@ class Canvas_2D(Canvas):
         self.btns_hidden = False
 
         self.glitching = False
+
+        self.current_song = song1
+        self.muted = False
+
+
+
+        self.switch_music()
+        
 
         self.print_color()
         
@@ -460,6 +484,32 @@ class Canvas_2D(Canvas):
         self.color = new_color
         self.print_color()
 
+    def pause_music(self):
+        if self.muted == False:
+            mixer.music.pause()
+            self.muted = True
+        else:
+            mixer.music.unpause()
+            self.muted = False
+
+    def switch_music(self):
+        # Loading the song 
+        
+        for song in music:
+            if self.current_song == song:
+                music.remove(song)#delete it temp so we dont play same song
+                randomsong = random.choice(music)
+                self.current_song = randomsong
+                mixer.music.load(randomsong) 
+                music.append(song)#add it back
+        
+        # Setting the volume 
+        mixer.music.set_volume(0.7) 
+        
+        # Start playing the song 
+        mixer.music.play(-1, 0.0) 
+
+
     def glitch_effect(self):
         if self.glitching == False:
             self.glitching = True
@@ -533,11 +583,9 @@ class Canvas_2D(Canvas):
             # self.update_idletasks()
     def increase_rotate_speed(self):
         self.rotspeed += .05
-        self.auto_rotate(x = 1, y = 1, right = 1)
 
     def decrease_rotate_speed(self):
         self.rotspeed -= .05
-        self.auto_rotate(x = 1, y = 1, right = 1)
 
     def stop_rotate(self):
         self.running = False
